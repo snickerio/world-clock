@@ -1,6 +1,6 @@
 # World Clock – React & TypeScript
 
-Detta är en individuell inlämningsuppgift i TypeScript/React som visar lokal tid för olika städer runt om i världen, med både analog och digital klocka. Projektet använder React Hooks, TypeScript och React Router.
+Detta är en individuell inlämningsuppgift i TypeScript/React som visar lokal tid för olika städer runt om i världen, med både analog och digital klocka. Projektet använder React Hooks, TypeScript och React Router. Fel med bilder, försökte implementera det men fick det inte att fungera och ingen mer tid att försöka fixa...
 
 ---
 
