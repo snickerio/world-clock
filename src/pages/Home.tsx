@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState} from 'react'
 import { Link } from 'react-router-dom'
 import timezones from '../data/timezones.json'
 import type { Timezone } from '../types'
@@ -18,11 +18,22 @@ function Home() {
     tz.utc.some((u) => featuredUtc.includes(u))
   )
 
+  //Favourite Cities
   const [favoriteCities, setFavoriteCities] = useState<Timezone[]>(() => {
     const saved = localStorage.getItem('favoriteCities')
     return saved ? JSON.parse(saved) : []
   })
 
+  //Own Cities
+  const [customCities, setCustomCities] = useState<Timezone[]>(() => {
+    const saved = localStorage.getItem('customCities')
+    return saved ? JSON.parse(saved) : []
+  })
+
+  const [newCityName, setNewCityName] = useState('')
+  const [newCityOffset, setNewCityOffset] = useState(0)
+
+  //Function for favourites
   const updateFavorites = (cities: Timezone[]) => {
     setFavoriteCities(cities)
     localStorage.setItem('favoriteCities', JSON.stringify(cities))
@@ -38,6 +49,31 @@ function Home() {
     updateFavorites(favoriteCities.filter((c) => c.value !== city.value))
   }
 
+    // Functions for own cities
+  const addCustomCity = () => {
+    if (!newCityName) return
+
+    const newCity: Timezone = {
+      value: newCityName,
+      abbr: '',
+      offset: newCityOffset * 60, // offset i minuter
+      isdst: false,
+      text: newCityName,
+      utc: [`Custom/${newCityName}`],
+    }
+
+    const updated = [...customCities, newCity]
+    setCustomCities(updated)
+    localStorage.setItem('customCities', JSON.stringify(updated))
+    setNewCityName('')
+    setNewCityOffset(0)
+  }
+  const removeCustomCity = (city: Timezone) => {
+  const updated = customCities.filter((c) => c.value !== city.value)
+  setCustomCities(updated)
+  localStorage.setItem('customCities', JSON.stringify(updated))
+}
+
   return (
     <div>
       <h1>World Clock 🌍</h1>
@@ -45,9 +81,7 @@ function Home() {
       <ul>
         {commonCities.map((city: Timezone) => (
           <li key={city.value}>
-            <Link to={`/city/${encodeURIComponent(city.utc[0])}`}>
-              {city.text}
-            </Link>
+            <Link to={`/city/${encodeURIComponent(city.utc[0])}`}>{city.text}</Link>
             <button onClick={() => addFavorite(city)} style={{ marginLeft: '10px' }}>
               Add
             </button>
@@ -61,13 +95,8 @@ function Home() {
           <ul>
             {favoriteCities.map((city) => (
               <li key={city.value}>
-                <Link to={`/city/${encodeURIComponent(city.utc[0])}`}>
-                  {city.text}
-                </Link>
-                <button
-                  onClick={() => removeFavorite(city)}
-                  style={{ marginLeft: '10px' }}
-                >
+                <Link to={`/city/${encodeURIComponent(city.utc[0])}`}>{city.text}</Link>
+                <button onClick={() => removeFavorite(city)} style={{ marginLeft: '10px' }}>
                   Remove
                 </button>
               </li>
@@ -75,6 +104,26 @@ function Home() {
           </ul>
         </>
       )}
+    {customCities.length > 0 && (
+        <>
+          <h2>Your Custom Cities:</h2>
+          <ul>
+            {customCities.map((city) => (
+              <li key={city.value}>
+                <Link to={`/city/${encodeURIComponent(city.utc[0])}`}>{city.text}</Link>
+                <button onClick={() => removeCustomCity(city)} style={{ marginLeft: '10px' }}>
+                  Remove
+                </button>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
+
+      <h2>Add Your Own City</h2>
+      <input type="text" placeholder="City Name" value={newCityName} onChange={(e) => setNewCityName(e.target.value)}/>
+      <input type="number" placeholder="UTC Offset" value={newCityOffset} onChange={(e) => setNewCityOffset(Number(e.target.value))}/>
+      <button onClick={addCustomCity}>Add City</button>
     </div>
     )}
 
